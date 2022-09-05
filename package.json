@@ -9,6 +9,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
     "@kangc/v-md-editor": "^2.3.15",
+    "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "element-plus": "^2.2.14",
@@ -17,6 +18,7 @@
     "sass": "^1.54.5",
     "sass-loader": "^13.0.2",
     "vue": "^3.2.13",
+    "vue-demi": "^0.13.11",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.2"
   },

@@ -1,7 +1,7 @@
 <template>
     <div class="layout-container-demo">
         <el-container>
-            <el-aside width="200px">
+            <el-aside width="200px" style="background-color:#bfc8d0">
                 <el-scrollbar>
                     <el-menu :default-openeds="['1']">
                         <el-menu-item index="1" @click="nowIndex=1">
