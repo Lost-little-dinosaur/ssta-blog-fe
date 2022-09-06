@@ -62,7 +62,8 @@
                     <el-upload action="#" list-type="picture-card" 
                     :auto-upload="false" 
                     :drag="true" 
-                    :before-upload="beforeUpload"
+                    :before-upload="beforeUpload(file)"
+                    :on-progress="handleUpload(file)"
                     class="upload-demo">
                         <el-icon><Plus /></el-icon>
 
@@ -128,11 +129,12 @@
 <script  lang="ts">
   //需要有下面这一段代码来导出组件
     import { ref } from 'vue'
-    import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
+    import { Delete, Download, Plus, UploadFilled, ZoomIn } from '@element-plus/icons-vue'
     import request from "../..//utils/request";
 
     import type { UploadFile } from 'element-plus'
-
+    //引入oss
+    import OSS from "ali-oss";
     export default {
         setup(){
             return{
@@ -140,6 +142,7 @@
         },
         data(){
             return{
+                file:UploadFilled,
                 disabled:false,
                 dialogVisible:false,
                 articleForm:{
@@ -153,7 +156,10 @@
         },
         methods:{
             beforeUpload(file: UploadFile){
-                console.log(1)
+                // console.log(1)
+            },
+            handleUpload(file: UploadFile){
+                // console.log(2)
             },
             handleRemove(file: UploadFile) {
                 console.log(file)
@@ -174,7 +180,6 @@
             handlePublishArticle(){
                 console.log("Article");
                 console.log(this.articleForm);
-                //下面是登录请求
                 request({
                     method: 'get',
                     url: '/',//也可以对接口的具体代码进行封装
