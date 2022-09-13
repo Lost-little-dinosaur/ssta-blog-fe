@@ -32,7 +32,8 @@
     import request from '@/utils/request';
     import { ElNotification } from 'element-plus'
     import { method } from 'lodash';
-    export default {
+    import { defineComponent } from 'vue'
+    export default defineComponent({
         data(){
             return{
                 form:reactive({
@@ -58,6 +59,7 @@
                         type: 'success',
                     })
                     this.dialogFormVisible = false;
+                    location.reload()
                 }).catch(err => {
                     
                     ElNotification({
@@ -68,7 +70,7 @@
                 })
             },
         }
-    }
+    })
     
 </script>
 <style scoped>

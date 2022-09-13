@@ -17,7 +17,7 @@
             <el-form-item label="短信验证码" :label-width="formLabelWidth">
                 <el-input v-model="form.verifyCode" autocomplete="off" style="width: 80px;"/>
                 <el-button type="primary" v-if="cacheTime>0" disabled style="margin-left: 30px;">
-                    重新发送({{cacheTime}})
+                    重新发送({{ cacheTime }})
                 </el-button>
                 <el-button type="primary" v-if="cacheTime==0" @click="sendShortMsg" style=" margin-left: 30px;">
                     发送短信验证码
@@ -40,106 +40,110 @@
                 注册
             </el-button>
         </span>
-    </template>
+        </template>
     </el-dialog>
 </template>
 
 <script lang="ts">
-    import { reactive, ref } from 'vue'
-    import request from '@/utils/request';
-    import { ElNotification } from 'element-plus'
-    import { method } from 'lodash';
-    export default {
-        data(){
-            return{
-                captcha:{
-                    id:"",
-                    raw:"",
-                    code:"",
-                },
-                cacheTime:0,
-                form:{
-                    phone:"18367195231",
-                    verifyCode:"",
-                    password:"",
-                    confirmPassword:"",
-                    studentID:"",
-                },
-                dialogFormVisible:false,
-                formLabelWidth:'140px',
-            }
+import {reactive, ref} from 'vue'
+import request from '@/utils/request';
+import {ElNotification} from 'element-plus'
+import {method} from 'lodash';
+import {defineComponent} from 'vue'
+
+export default defineComponent({
+    data() {
+        return {
+            captcha: {
+                id: "",
+                raw: "",
+                code: "",
+            },
+            cacheTime: 0,
+            form: {
+                phone: "18367195231",
+                verifyCode: "",
+                password: "",
+                confirmPassword: "",
+                studentID: "",
+            },
+            dialogFormVisible: false,
+            formLabelWidth: '140px',
+        }
+    },
+    methods: {
+        getCaptcha() {
+            request({
+                url: '/base/captcha',
+                method: 'get',
+            }).then(res => {
+                this.captcha.id = res.data.data.id;
+                this.captcha.raw = res.data.data.raw;
+                // console.log(this.captcha);
+            }).catch(err => {
+                ElNotification({
+                    title: 'Error',
+                    message: err.message,
+                    type: 'error',
+                })
+            })
         },
-        methods:{
-            getCaptcha(){
-                request({
-                    url: '/base/captcha',
-                    method: 'get',
-                }).then(res => {
-                    this.captcha.id = res.data.data.id;
-                    this.captcha.raw = res.data.data.raw;
-                    // console.log(this.captcha);
-                }).catch(err => {
+        sendShortMsg() {
+            this.getCaptcha();
+            request({
+                url: '/user/register/code',
+                method: 'post',
+                data: {
+                    phone: this.form.phone,
+                    captchaId: this.captcha.id,
+                    captchaValue: this.captcha.code,
+                }
+            }).then(res => {
+                // console.log(res);
+                ElNotification({
+                    title: 'Success',
+                    message: "已成功向" + this.form.phone + "发送短信验证码",
+                    type: 'success',
+                })
+            }).catch(err => {
+                // console.log(err);
+                if (err.response.data.code < 40300 && err.response.data.code >= 40200) {
+                    ElNotification({
+                        title: 'Error',
+                        message: err.response.data.message,
+                        type: 'error',
+                    })
+                } else {
                     ElNotification({
                         title: 'Error',
                         message: err.message,
                         type: 'error',
                     })
-                })
-            },
-            sendShortMsg(){
-                this.getCaptcha();
-                request({
-                    url: '/user/register/code',
-                    method: 'post',
-                    data:{
-                        phone:this.form.phone,
-                        captchaId:this.captcha.id,
-                        captchaValue:this.captcha.code,
-                    }
-                }).then(res => {
-                    // console.log(res);
-                    ElNotification({
-                        title: 'Success',
-                        message: "已成功向"+this.captcha.phone+"发送短信验证码",
-                        type: 'success',
-                    })
-                }).catch(err => {
-                    // console.log(err);
-                    if (err.response.data.code<40300 && err.response.data.code>=40200){
-                        ElNotification({
-                            title: 'Error',
-                            message: err.response.data.message,
-                            type: 'error',
-                        })
-                    }else{
-                        ElNotification({
-                            title: 'Error',
-                            message: err.message,
-                            type: 'error',
-                        })
-                    }
-                })
-            }
-        },
-        mounted(){
-            this.getCaptcha();
-        },
-    }
-    
+                }
+            })
+        }
+    },
+    mounted() {
+        this.getCaptcha();
+    },
+})
+
 </script>
 <style scoped>
-    .el-button--text {
-        margin-right: 15px;
-    }
-    .el-input {
-        width: 300px;
-    }
-    .dialog-footer button:first-child {
-        margin-right: 10px;
-    }
+.el-button--text {
+    margin-right: 15px;
+}
 
-    .el-form-item{
-        margin:50px;
-    }
+.el-input {
+    width: 300px;
+}
+
+.dialog-footer button:first-child {
+    margin-right: 10px;
+}
+
+.el-form-item {
+    margin: 50px;
+}
 
 </style>
