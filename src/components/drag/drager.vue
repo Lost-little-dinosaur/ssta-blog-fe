@@ -100,34 +100,8 @@ export default defineComponent({
         "updateIndex"
     ],
     setup(props ,{emit}) {
-        // console.log(props,emit)
-//         import {ref} from 'vue'
-//         import {ElMessageBox} from 'element-plus'
-// // let randomChickenSoup="世界，因你而改变"
         const drawer2 = ref(false)
         const direction = ref('ltr')
-//         const handleClose = (done: () => void) => {
-//             ElMessageBox.confirm('Are you sure you want to close this?')
-//                 .then(() => {
-//                     done()
-//                 })
-//                 .catch(() => {
-//                     // catch error
-//                 })
-//         }
-// // function cancelClick() {
-// //     drawer2.value = false
-// // }
-//         function confirmClick() {
-//             ElMessageBox.confirm(`Are you confirm to chose ${radio1.value} ?`)
-//                 .then(() => {
-//                     drawer2.value = false
-//                 })
-//                 .catch(() => {
-//                     // catch error
-//                 })
-//         }
-//
         const passIndex = (index: number) => {
             emit("updateIndex", index)
             drawer2.value = false
@@ -136,9 +110,6 @@ export default defineComponent({
             passIndex,
             direction,
         }
-//         setTimeout( () => {
-//             emit('updateIndex', 1);
-//         }, 5000);
     },
     methods: {
         tempPassIndex(n:number){

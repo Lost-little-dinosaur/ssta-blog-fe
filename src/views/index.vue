@@ -6,15 +6,15 @@
                 <el-header style="background-color:#98a5b2;">
                     <el-row>
                         <el-col :span="1">
-                            <Drager :userPermisson="userInfo.Permission" @updateIndex="updateIndex" a="1"/>
+                            <Drager :userPermisson="userInfo.Permission" @updateIndex="updateIndex"/>
                         </el-col>
-                        <el-col :span="17" v-if="userInfo.Permission==5"></el-col>
-                        <el-col :span="6" v-if="userInfo.Permission==5">
+                        <el-col :span="17" v-if="userInfo.Permission===5"></el-col>
+                        <el-col :span="6" v-if="userInfo.Permission===5">
                             <Login/>
                             <Register/>
                         </el-col>
-                        <el-col :span="16" v-if="userInfo.Permission!=5"></el-col>
-                        <el-col :span="6" v-if="userInfo.Permission!=5">
+                        <el-col :span="16" v-if="userInfo.Permission!==5"></el-col>
+                        <el-col :span="6" v-if="userInfo.Permission!==5">
                             <el-dropdown>
                                 <span style="font-size:medium;margin: 10px;line-height: 50px;">
                                     欢迎，{{ userInfo.NickName + "\n" }}
@@ -34,12 +34,13 @@
                 <el-main>
                     <el-scrollbar style="background-color:#d4dadd;">
                         <div style="background-color:#ffffff;margin: 20px;">
-                            <el-row>
+                            <el-row style="width: 107%">
                                 <el-col :span="1">
 
                                 </el-col>
                                 <el-col :span="21">
-                                    <Edit v-if="nowIndex==5"/>
+                                    <Edit v-if="nowIndex===5"/>
+                                    <CatalogueShow v-if="nowIndex===2" />
                                 </el-col>
                             </el-row>
                         </div>
@@ -59,8 +60,8 @@ import Edit from "../components/articles/Edit.vue"
 import Login from "../components/Authority/Login.vue"
 import Register from "../components/Authority/Register.vue"
 import Drager from "../components/drag/drager.vue"
+import CatalogueShow from "../components/catalogue/CatalogueShow.vue"
 import request from "../utils/request";
-import {userInfo} from 'os';
 import {defineComponent} from 'vue'
 
 export default defineComponent({
@@ -69,6 +70,7 @@ export default defineComponent({
         Edit,
         Login,
         Drager,
+        CatalogueShow,
     },
     mounted() {
         this.checkLogin();
@@ -78,7 +80,7 @@ export default defineComponent({
     data() {
         return {
             asideVisible: true,
-            nowIndex: 1,
+            nowIndex: 2,
             userInfo: {
                 Avatar: "",
                 Email: "",
