@@ -1,0 +1,273 @@
+<template>
+    <el-row>
+        <el-col :span="16">
+            <div style="height: 30px;background-color:#f3f3f3;margin: 6px">
+                <el-breadcrumb :separator-icon="ArrowRight" style="margin: 3px 15px">
+                    <el-breadcrumb-item>
+                        <el-button link size="large" style="margin-top: 3px">
+                            <div style="font-size: large">根目录</div>
+                        </el-button>
+                    </el-breadcrumb-item>
+                    <el-breadcrumb-item>
+                        <el-button link size="large" style="margin-top: 3px">
+                            <div style="font-size: large">test</div>
+                        </el-button>
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
+        </el-col>
+        <el-col :span="1">
+            <el-button :loading="false" style="margin-top: 5px" text bg type="primary"
+                       @click="handleLoadNowPath('刷新')">刷新
+            </el-button>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col>
+            <el-auto-resizer>
+                <template #default="{ height, width }">
+                    <el-table-v2
+                        :columns="columns"
+                        :data="tableData"
+                        :width="1700"
+                        :height="700"
+                        fixed
+                    />
+                </template>
+            </el-auto-resizer>
+        </el-col>
+    </el-row>
+</template>
+
+<script lang="tsx">
+import type Node from 'element-plus/es/components/tree/src/model/node'
+import {defineComponent, FunctionalComponent, ref, resolveDynamicComponent, unref} from "vue";
+import {ArrowRight, Message} from '@element-plus/icons-vue'
+import request from "@/utils/request";
+import dayjs from 'dayjs'
+import {
+    ElButton,
+    ElIcon,
+    ElTag,
+    ElTooltip,
+    TableV2FixedDir,
+    Column,
+    ElCheckbox,
+    ElMessage,
+    ElNotification,
+    CheckboxValueType
+} from 'element-plus'
+import {Timer} from '@element-plus/icons-vue'
+
+export default defineComponent({
+    setup() {
+        const Checkbox = resolveDynamicComponent('ElCheckbox') as typeof ElCheckbox
+
+        type SelectionCellProps = {
+            value: boolean
+            intermediate?: boolean
+            onChange: (value: boolean) => void
+        }
+
+        const SelectionCell: FunctionalComponent<SelectionCellProps> = ({
+                                                                            value,
+                                                                            intermediate = false,
+                                                                            onChange,
+                                                                        }) => {
+            return (
+                <Checkbox
+                    onChange={onChange}
+                    modelValue={value}
+                    indeterminate={intermediate}
+                />
+            )
+        }
+
+        const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
+            Array.from({ length }).map((_, columnIndex) => ({
+                ...props,
+                key: `${prefix}${columnIndex}`,
+                dataKey: `${prefix}${columnIndex}`,
+                title: `Column ${columnIndex}`,
+                width: 150,
+            }))
+
+        const generateData = () =>
+            Array.from({ length }).map((_, rowIndex) => {
+                return columns.reduce(
+                    (rowData, column, columnIndex) => {
+                        rowData[column.dataKey] = `Row ${rowIndex} - Col ${columnIndex}`
+                        return rowData
+                    },
+                    {
+                        id: `${prefix}${rowIndex}`,
+                        checked: false,
+                        parentId: null,
+                    }
+                )
+            })
+
+        let id = 0
+
+        const dataGenerator = () => ({
+            id: `random-id-${++id}`,
+            name: 'Tom',
+            date: '2020-10-1',
+        })
+
+        const columns: Column<any>[] = [
+            {
+                key: '文件夹名字',
+                title: '文件夹名字',
+                dataKey: 'catalogueName',
+                width: 250,
+                align: 'center',
+                cellRenderer: ({cellData: name}) => name,
+            },
+            {
+                key: '创建者',
+                title: '创建者',
+                dataKey: 'createBy',
+                width: 200,
+                align: 'center',
+                cellRenderer: ({cellData: name}) => name,
+            },
+            {
+                key: '最后修改者',
+                title: '最后修改者',
+                dataKey: 'lastModifier',
+                width: 200,
+                align: 'center',
+                cellRenderer: ({cellData: name}) => name,
+            },
+            {
+                key: '最后修改时间',
+                title: '最后修改时间',
+                dataKey: 'createOrUpdateAt',
+                width: 150,
+                align: 'center',
+                cellRenderer: ({cellData: name}) => name,
+            },
+            {
+                key: '描述',
+                title: '描述',
+                dataKey: 'description',
+                width: 600,
+                align: 'center',
+                cellRenderer: ({cellData: name}) => (
+                    <>
+                        <div>haha</div>
+                    </>
+                ),
+            },
+            {
+                key: 'operations',
+                title: 'Operations',
+                cellRenderer: () => (
+                    <>
+                        <ElButton size="small">Edit</ElButton>
+                        <ElButton size="small" type="danger">
+                            Delete
+                        </ElButton>
+                    </>
+                ),
+                width: 150,
+                align: 'center',
+            },
+        ]
+        columns.unshift({
+            key: 'selection',
+            width: 50,
+            cellRenderer: ({ rowData }) => {
+                const onChange = (value: boolean) => (rowData.checked = value)
+                return <SelectionCell value={rowData.checked} onChange={onChange} />
+            },
+
+            headerCellRenderer: () => {
+                const _data = unref(data)
+                const onChange = (value: boolean) =>
+                    (data.value = _data.map((row) => {
+                        row.checked = value
+                        return row
+                    }))
+                const allSelected = _data.every((row) => row.checked)
+                const containsChecked = _data.some((row) => row.checked)
+
+                return (
+                    <SelectionCell
+                        value={allSelected}
+                        intermediate={containsChecked && !allSelected}
+                        onChange={onChange}
+                    />
+                )
+            },
+        })
+        const data = ref(generateData(columns, 200))
+        return {
+            ArrowRight,
+            columns,
+            Checkbox,
+            data,
+            dataGenerator,
+            generateColumns,
+            generateData,
+            SelectionCell,
+
+        }
+    },
+    methods: {
+        handleLoadNowPath(msg: string) {
+            let nowPath = JSON.parse(localStorage.getItem("nowPath") as string);
+            if (nowPath == null) {
+                request({
+                    url: '/catalogues/list',
+                    method: 'get',
+                }).then((res: any) => {
+                    if (res.data.code == 20000) {
+                        this.tableData = res.data.data.sonArr
+                        ElMessage({
+                            message: msg + '数据成功',
+                            type: 'success',
+                        })
+                    } else {
+                        ElNotification({
+                            title: 'Error',
+                            message: res.data.msg,
+                            type: 'error',
+                        })
+                        Message.error(res.data.msg);
+                    }
+                }).catch((err: any) => {
+                    ElNotification({
+                        title: 'Error',
+                        message: err.message,
+                        type: 'error',
+                    })
+                    Message.error(err);
+                });
+            }
+        }
+    },
+    data() {
+        return {
+            nowPath: JSON.parse(localStorage.getItem("nowPath") as string),
+            tableData: [{
+                "catalogueName": "出现这个说明您网络未连接成功或者服务器出现问题",
+                "description": "出现这个说明您网络未连接成功或者服务器出现问题",
+                "catalogueID": "出现这个说明您网络未连接成功或者服务器出现问题",
+                "createBy": "出现这个说明您网络未连接成功或者服务器出现问题",
+                "lastModifier":"出现这个说明您网络未连接成功或者服务器出现问题",
+                "createOrUpdateAt": "出现这个说明您网络未连接成功或者服务器出现问题",
+                "articleArr": null,
+                "sonArr": null
+            }]
+        }
+    },
+    mounted() {
+        this.handleLoadNowPath("获取");
+    },
+})
+</script>
+
+<style>
+</style>

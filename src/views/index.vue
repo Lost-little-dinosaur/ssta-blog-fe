@@ -1,54 +1,64 @@
 <template>
-    <div class="layout-container-demo">
-        <el-container>
-
-            <el-container>
-                <el-header style="background-color:#98a5b2;">
+    <el-container>
+        <el-header style="background-color:#98a5b2;">
+            <el-row>
+                <el-col :span="1">
+                    <Drager :userPermisson="userInfo.Permission" @updateIndex="updateIndex"/>
+                </el-col>
+                <el-col :span="17" v-if="userInfo.Permission===5"></el-col>
+                <el-col :span="6" v-if="userInfo.Permission===5">
+                    <Login/>
+                    <Register/>
+                </el-col>
+                <el-col :span="16" v-if="userInfo.Permission!==5"></el-col>
+                <el-col :span="6" v-if="userInfo.Permission!==5">
+                    <el-dropdown>
+                        <span style="font-size:medium;margin: 10px;line-height: 50px;">
+                            欢迎，{{ userInfo.NickName + "\n" }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-avatar :size="50" :src=userInfo.Avatar style="margin-top:3px">
+                        <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"/>
+                    </el-avatar>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main style="--el-main-padding:0">
+            <el-scrollbar style="background-color:#d4dadd;">
+                <div style="background-color:#ffffff;margin: 20px;">
                     <el-row>
-                        <el-col :span="1">
-                            <Drager :userPermisson="userInfo.Permission" @updateIndex="updateIndex"/>
+                        <el-col :span="1"></el-col>
+                        <el-col :span="22">
+                            <Edit v-if="nowIndex===5"/>
+                            <CatalogueShow v-if="nowIndex===2"/>
                         </el-col>
-                        <el-col :span="17" v-if="userInfo.Permission===5"></el-col>
-                        <el-col :span="6" v-if="userInfo.Permission===5">
-                            <Login/>
-                            <Register/>
-                        </el-col>
-                        <el-col :span="16" v-if="userInfo.Permission!==5"></el-col>
-                        <el-col :span="6" v-if="userInfo.Permission!==5">
-                            <el-dropdown>
-                                <span style="font-size:medium;margin: 10px;line-height: 50px;">
-                                    欢迎，{{ userInfo.NickName + "\n" }}
-                                </span>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
-                            <el-avatar :size="50" :src=userInfo.Avatar style="margin-top:3px">
-                                <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"/>
-                            </el-avatar>
-                        </el-col>
+                        <el-col :span="1"></el-col>
                     </el-row>
-                </el-header>
-                <el-main>
-                    <el-scrollbar style="background-color:#d4dadd;">
-                        <div style="background-color:#ffffff;margin: 20px;">
-                            <el-row style="width: 107%">
-                                <el-col :span="1">
-
-                                </el-col>
-                                <el-col :span="21">
-                                    <Edit v-if="nowIndex===5"/>
-                                    <CatalogueShow v-if="nowIndex===2" />
-                                </el-col>
-                            </el-row>
-                        </div>
-                    </el-scrollbar>
-                </el-main>
-            </el-container>
-        </el-container>
-    </div>
+                </div>
+            </el-scrollbar>
+        </el-main>
+        <el-footer style="background-color:#98a5b2;height: 100px">
+            <el-row>
+                <el-col :span="11"></el-col>
+                <el-col :span="12">
+                    <div>
+                        <span style="margin-bottom: 10px">
+                            Contributors
+                        </span>
+                        <a href="https://github.com/Lost-little-dinosaur">
+                            <el-avatar :size="30" src="https://avatars.githubusercontent.com/u/82520400?v=4"/>
+                        </a>
+                    </div>
+                </el-col>
+                <el-col></el-col>
+            </el-row>
+        </el-footer>
+    </el-container>
 </template>
 
 <script lang="ts">
@@ -95,7 +105,7 @@ export default defineComponent({
         };
     },
     methods: {
-        updateIndex (n: number) {
+        updateIndex(n: number) {
             // alert("hahahaha");
             this.nowIndex = Number(n);
         },
@@ -132,15 +142,15 @@ export default defineComponent({
                             message: res.data.msg,
                             type: 'error',
                         })
-                        Message.error(res.data.msg);
+                        // Message.error(res.data.msg);
                     }
                 }).catch((err: any) => {
                     ElNotification({
                         title: 'Error',
-                        message: err.message,
+                        message: err.response.data.message,
                         type: 'error',
                     })
-                    Message.error(err);
+                    // Message.error(err);
                 });
             }
         },
